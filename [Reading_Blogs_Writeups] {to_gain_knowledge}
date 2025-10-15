@@ -4,9 +4,33 @@
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-https://osintteam.blog/p3-medium-how-i-gain-access-to-nasas-internal-workspace-d0896fee563c
+ https://osintteam.blog/p3-medium-how-i-gain-access-to-nasas-internal-workspace-d0896fee563c
 
 just use an google dork and found the internal slack pdf 
 dork --> site:"*.nasa.gov" | "slack"
 --> visiting that pdf it leads him to internal meetings records leaks of the NASA peoples 
 --> Good p3 bug
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+https://medium.com/@ali.zamini/ssti-in-bug-bounty-program-the-time-i-played-with-handlebars-and-broke-stuff-7dc1f9834a3d
+
+      1. Found a curious domain assume: mb.target.tld
+      2. There was an search field as per IDs played with that
+      3. Got a js file there that developer gave a hint like:
+          3.1 Seems that result format/handling/etc has been changed
+              I did some not too funny fixes to make it work here as well
+              - onAlldevices - result data is string, eval it
+              - onSingleDevice - without 'callback' response is lost somewhere
+      4. Till now the user was searching like: ?id=123 by seeing callback and eval the user started like:
+             4.1 ?id=123&callback=eval --> it does gives some result by reflecting eval like --> evel{id=123, "SOME_OTHER_INFO":"INFO"}} 
+              4.2 Using anyother things instead of eval will also give us result but will not print anything on the page --> but the user input has been activated
+      5. Now the user tweak the output to change the page hai...{k garako vanda ava kai request ma change garara output kasto auncha herna aatako}
+           5.1 ?id=123&callback=eval({"Id":1,"Brand":"Alcatel", "SOME_OTHER_INFO":"Terrestrial"});// HTTP/1.1
+           5.2 Great the page displayed --> "SOME_OTHER_INFO":"Terrestrial" --> so katai kai na kai ta vaye raxa it's good
+      6. Now the user decided to do something like this, in the user controlled field he just do is: 4*4 
+           6.1 ?id=123&callback=eval({"Id":1,"Brand":"Alcatel", "SOME_OTHER_INFO":"4*4"});//
+           6.2 It shown 16 in the page ---> great SSTI found --> this is happens due to improper uses of eval function with handlebar template  
+      7. This cause due to an using an eval and outdated can say template engine ---> always test like this don't forget Rabin ---> Always read the js files
