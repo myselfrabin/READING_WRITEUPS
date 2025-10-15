@@ -1,0 +1,12 @@
+*** Reading daily writeups and daily habit ***
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+https://osintteam.blog/p3-medium-how-i-gain-access-to-nasas-internal-workspace-d0896fee563c
+
+just use an google dork and found the internal slack pdf 
+dork --> site:"*.nasa.gov" | "slack"
+--> visiting that pdf it leads him to internal meetings records leaks of the NASA peoples 
+--> Good p3 bug
