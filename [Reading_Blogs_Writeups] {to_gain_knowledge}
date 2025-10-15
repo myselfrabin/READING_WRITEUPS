@@ -25,7 +25,7 @@ https://medium.com/@ali.zamini/ssti-in-bug-bounty-program-the-time-i-played-with
               - onAlldevices - result data is string, eval it
               - onSingleDevice - without 'callback' response is lost somewhere
       4. Till now the user was searching like: ?id=123 by seeing callback and eval the user started like:
-             4.1 ?id=123&callback=eval --> it does gives some result by reflecting eval like --> evel{id=123, "SOME_OTHER_INFO":"INFO"}} 
+             4.1 ?id=123&callback=eval --> it does gives some result by reflecting eval like --> eval{id=123, "SOME_OTHER_INFO":"INFO"}} 
               4.2 Using anyother things instead of eval will also give us result but will not print anything on the page --> but the user input has been activated
       5. Now the user tweak the output to change the page hai...{k garako vanda ava kai request ma change garara output kasto auncha herna aatako}
            5.1 ?id=123&callback=eval({"Id":1,"Brand":"Alcatel", "SOME_OTHER_INFO":"Terrestrial"});// HTTP/1.1
