@@ -34,3 +34,50 @@ https://medium.com/@ali.zamini/ssti-in-bug-bounty-program-the-time-i-played-with
            6.1 ?id=123&callback=eval({"Id":1,"Brand":"Alcatel", "SOME_OTHER_INFO":"4*4"});//
            6.2 It shown 16 in the page ---> great SSTI found --> this is happens due to improper uses of eval function with handlebar template  
       7. This cause due to an using an eval and outdated can say template engine ---> always test like this don't forget Rabin ---> Always read the js files
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ https://medium.com/@ultranoob/weird-and-simple-2fa-bypass-without-any-test-b869e09ac261
+
+       1. The website has 2FA mechanism, enable it and start playing it.
+       2. The 2fa was time based one time password 2FA.
+           2.1  After every 30 sec the otp is been changing inside the Authenticator app
+           2.2 Intresting, it has some backup codes in case the don't have access to the device.
+       3. NOW BYPASS STORY, 
+         3.1 Enable the 2FA after enabling it got backup code in case the user don't have access to the device totp.
+         3.2 The backup codes are of 8 digit
+         3.3 Now the user logged out and again check the application
+         3.4  There was the option to login to the application with the backup codes
+            3.4.1 The user clicked it and put the random 8 digit backup codes and hence it grant a access 
+     4. Hence, this was the bug it didnot check the validation for the backup codes any 8 digit random code will work here.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
