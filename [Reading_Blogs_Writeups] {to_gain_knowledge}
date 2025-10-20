@@ -52,11 +52,27 @@ https://medium.com/@ali.zamini/ssti-in-bug-bounty-program-the-time-i-played-with
      4. Hence, this was the bug it didnot check the validation for the backup codes any 8 digit random code will work here.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+OCT - 20
+
+https://medium.com/sourav-sahana/bypass-2fa-in-a-website-d616eaead1e3
+
+  1. The website has the 2FA enable with the google Authenticator app.
+  2. First tried in the login page, didnot success and move on to the forgot password page
+  3. On Forget password page:
+     3.1 Enter the Email-Id and click the Forget password and got the email
+     3.2 The email looks like:  https://app.domain .io/reset/645hNr78tr5410HgG6yvYZtk2Y45lki7/
+     3.3 The user visited the URL and enter the new password, and then the 2FA token was asked the user tried to bypass with response manipulation but it 
+         didnot work too
+ 4. So the user visited the burp to see the request, to see what request is going with the 2fa
+     4.1 It was a POST request with reset_key, email, csrf, password and token in the parameter
+     4.2 Intresting, here token was the 2fa key
+     4.3 So the user deleted the token parameter and it's value and then forward the request ---> boom the password has been changed.
+5. The 2FA has been bypassed
+6. So the main logic here was: 
+    6.1 The 2fa key was in the token parameter deleting it and forwarding the request woudl give any valid user password should change.
 
 
-
-
-
+    
 
 
 
