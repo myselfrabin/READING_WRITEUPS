@@ -1,0 +1,30 @@
+OCT - 20: 
+
+https://fortbridge.co.uk/research/idor-exploitation-via-hpp-api-hacking-case-study/ 
+KEYPOINT: 
+1. IDOR VIA HTTP PARAMETER POLLUTION
+2. There was not SQLI or XSS so the tester moved towards IDOR 
+
+ACTUAL STORY: 
+1. The tester already first test for serveral other bugs like xss,sqli they didnot found it.
+2. They initially also test for an IDOR by manipulating IDs they were not able to found that too ----> IDs manipulate garara idor khojyo but vetana suru tira
+3. At final the tester found a critical bug IDOR  exploting via HTTP Parameter Pollution --> last ma chai idor vetyo through HPP 
+4.  Bypassing ACLs – IDOR exploitation via HPP:
+     4.1 Tried with maniputaing with IDs no luck
+     4.2 Now tried with HPP --> this simply means adding another parameter as the same name with the existing parameter, in this case the parameter was customer id.
+     4.3 The name shoudl be the exact, so the testers look the JSON response and found out it was :"CustomerId" key.
+     4.4 Now they add a new parameter called: CustomerId: <customer_ids>, with a GET request
+          4.4.1 The request look like: GET /api/a/b/c/random/stuff/v1/23923017/again/random/stuff/CustomerId=23923017 --> this leaks the PII data throgh HPP   
+5. So till now the testers are able to still the PII of another customer by simply adding a GET parameter with the name customerid and a random integer value.
+6. This was the systematic issue that affect the API from idor via hpp.
+7. Again the tester were able to exploited the /addresses/<<customerid>> endpoint to leak all the registered addresses of any customer.
+8. Now the developers fixed it and the testers were able to bypass it again: 
+   8.1 Bypassing the fix: 
+      8.1.1 Still there are many parameter that were vulnerable to previous exploit
+      8.1.2 One simple way to bypass it is to: Change parameter from GET to POST  --> this is with some limited info only no PII leak hai 
+9. So the logic and main issue is: if there is no idor with simple manipulating ids go with the hpp as well.
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+     
