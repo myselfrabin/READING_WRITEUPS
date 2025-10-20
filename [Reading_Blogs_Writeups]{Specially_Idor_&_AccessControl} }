@@ -22,7 +22,7 @@ ACTUAL STORY:
    8.1 Bypassing the fix: 
       8.1.1 Still there are many parameter that were vulnerable to previous exploit
       8.1.2 One simple way to bypass it is to: Change parameter from GET to POST  --> this is with some limited info only no PII leak hai 
-9. So the logic and main issue is: if there is no idor with simple manipulating ids go with the hpp as well.
+9. So the logic and main issue is: if there is no idor with simple manipulating ids go with the http parameter pollution as well.
 
 
 
