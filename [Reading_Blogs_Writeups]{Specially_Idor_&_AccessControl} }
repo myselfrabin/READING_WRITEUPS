@@ -32,12 +32,35 @@ OCT - 21:
 
 https://freedium.cfd/https://blog.bugbountyhunter.xyz/idor-on-hackerone-embedded-submission-form-9e59c6f044b3
 
+REWARD --> $2500
+
 KEYPOINT: 
 1. It's IDOR ON HACKERONE EMBEDDED SUBMISSION FORM
 2. FOUND AN IDOR THROUGH GRAPHQL API
 
 LET'S GET INTO ACTION: 
-1. 
+1. At first bro, found a IDOR In hackerone embedded submission form, to access sensitive info hai.
+2. The following graphql API was used: 
+    2.1 POST /graphql?embedded_submission_form_uuid=<UUID> HTTP/2 
+        --
+        --
+        --
+     2.2 Now if the UUID is still alive and this shows the information about the program embedded submission form.   --> this report was closed at duplicate N/A
+3. Now the real exploit story, intresting one: 
+     3.1 Bro found the UUID which is already dead or inactive ---> pailai tyo uuid net ma publish vaye ne the company make it dead not useable hai
+     3.2 And using that UUDI, if we check the user interface it will show the program is not live --> which is good as expected beacuse it's the dead UUID
+     3.3 So intresting thing here is with the dead UUID if we  try to query the information using the same GraphQL then it will gives us all the info about the program where that
+         UUID is belongs to:   ---> Great found different idor here if we have that UUID
+4. Now, how bro is able to find that UUID???
+    4.1 From an recon process like:
+         4.1.1 echo 'https://hackerone.com/' | waybackurls > lists.txt
+         4.1.2  cat lists.txt | grep "embedded_submissions" > results.txt
+         4.1.3 cat results.txt
+         4.1.4 Here, in the results.txt there is lots of embedded submission id from there we can collect the id and use it on the vulnerable graphql to get the
+                sensitive info about the program. 
+5. Logic and must to do: 
+   5.1 Do proper recon always and don't settle for less read more test more
+     
 
 
 
