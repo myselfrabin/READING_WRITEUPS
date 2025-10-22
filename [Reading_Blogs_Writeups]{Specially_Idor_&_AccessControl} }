@@ -141,14 +141,42 @@ LET'S START THE STORY:
     9.2 Look every request carefully kun parameter lai manipulate garda k huncha hatauda k huncha everything and make a note of it
     9.3 Gold info: Look with changing the request method: like PUT works here 
 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+OCT - 22 
 
+https://medium.com/@muhammadiman2468/idor-how-do-i-find-the-first-vulnerability-with-a-2500-bounty-on-hackerone-7afb3d8b5739
 
+REWARD: $2500
 
+ABOUT: Bro can see the mobile number address of other user through on hackerone --> Niceeeeeeee
 
+LET'S START THE ACTUAL STORY: 
 
+1. Found idor at the change shipping address feature --> shipping address feature endpoint ma idor vetyo
+2. At that endpoint when need to order something the shipping address need to be change while after changing the address the request looks like this: 
+    2.1 POST /api/v1/shop/shipping_address/get? 
+        --
+        --
+        {"change_addr_order_type":1,"change_addr_order_id":"577609598132390705" } --> there are more parameter but this are the buggy one so wrote this 
+    2.2 RESPONSE: 
+           2.2.1 Shows the private info about mobile number and address --> till now it's common it's own details
+3. Now, replacing the change_addr_order_id":"577609598132390705" --> this with the victim change_addr_order_id --> boom this gives every internal detail of victim like: 
+    mobile number, address 
+4. Ok until here bro founds an idor and simply he can report but no --> curiosity he wants to know how the change_addr_order_id":"577609598132390705" this was generated.
+       4.1 By playing somedays on the application bro found that: order_id: 577609598132325169 and change_addr_order_id":577609598132390705
+       4.2 often trying to find the relation between this two: bro founds out that: this two is difference between 2 power 16 i.e 65536 --> boom done puzzle solved to 
+       4.3 change_addr_order_id is just the order_id plus 2^16 (65536)
+       4.4 Ok from here having any order_id bro can generate  change_addr_order_id and by using that bro can view anyone's mobile number and address --> good idor
 
+5. Logic and keypoints: 
+    5.1 If you got an idor first don't settle for less try to make more impactful 
+    5.2 Try to find out the relation of ids with other too by this you can view data of many person's.
+6. One-liner summary:
+Found a high-impact IDOR where change_addr_order_id is a trivially predictable derivation of order_id (add 65536);
+Fixing requires proper ownership checks and replacing predictable IDs with opaque tokens or signed IDs.
 
+ 
 
 
 
