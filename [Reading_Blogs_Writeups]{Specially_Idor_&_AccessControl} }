@@ -60,13 +60,58 @@ LET'S GET INTO ACTION:
                 sensitive info about the program. 
 5. Logic and must to do: 
    5.1 Do proper recon always and don't settle for less read more test more
-     
 
 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+OCT - 22 
 
+https://medium.com/@bxrowski0x/bypassing-an-idor-a-couple-of-times-4d67555a1545
 
+ABOUT: Bro, bypassed a IDOR twice which leaks customer PII data.
 
+LET'S START THE STORY: 
+1. Bro,went to the profile it runs of /profile/setting --> and open the burp he saws the req goes through: /api/v4/users/2265 --> look numeric id you can play with it
+2. Bro tried a few normal tricks here to get idor but still no success --> read that tries in his writeups what he tries vanne 
+3. Played with request methods: 
+    3.1 Change the request to POST [show a 404]
+    3.2 Change the request to PUT [shows 500 internal server error] --> something happens here needed to be checked
+4. Now changing the request method to PUT and adding a {_method= PATCH} in the body ---> this gives a 200 res, with user sensitive info  --> great  
+      --> but sometimes 200 sometimes 500 
+   4.1 This shows 200 OK sometimes and sometimes 500 internal server error this is so weird
+   4.2 This much was the not much info: so bro dig more and found a parameter called {include} that takes some value firstname/lastname/email when we use it the response.
+5. Now the request would be look like: 
+    PUT /api/v4/users/1?include=firstname%2Clastname%2CdisplayName%2Cemail%2Cimage%2CisMe HTTP/2
+    --
+    --
+    _method = PATCH 
+    5.1 OK, it gives 200 OK with the users sensitive info hai
+    5.2 Nice till now, but at the triager side it was not reproduce --> don't know why they were getting 401 unauthorized
+6. So this time what bro does is: keeping the request as same but without body {_method = PATCH } --> this gives an info leak
+   6.1 PUT /api/v4/users/1?include=firstname%2Clastname%2CdisplayName%2Cemail%2Cimage%2CisMe HTTP/2 --> this  req without whole body --> this does works
+
+7. Another story of bypassing the bypass:
+   7.1 Bro changed the profile first name: and the request looks like: 
+      7.1.1 PUT /api/v4/user/ HTTP/2
+            --
+            id=id_here&firstname=first_name --> now here changing id to another id {403} & using hpp also 403 like: id=4&id=1 {403]
+    7.2 Ok, now what the request takes is: it takes both bodies and path query too like: ?something 
+        7.2.1 PUT /api/v4/user/?include=email
+              --
+              --
+              id=22652&firstname=testaqq --> this was giving now 200OK hai
+8. Now what bro did to achieve idor is intresting: 
+     8.1 In query parameter own details in body paramter victim id --> this gives in response victim sensitive info
+        8.1.1 PUT /api/v4/user/22652?include=firstname%2Clastname%2CdisplayName%2Cemail%2CisMe HTTP/2
+              --
+              id=victim_id --> ok this leaks everything about victim user PII info.   --> bro need to remove firstname cause it was giving 403 so giving only id.
+9. Things to understand and logic: 
+    9.1 Try diff request methods
+    9.2 Try with method override too like: _method = PATCH in body
+    9.3 Check if the request is accepting string query like: ? or body query --> check for this both 
+    9.4 Just stay curious and consistent
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
