@@ -117,12 +117,29 @@ OCT - 22
 
 https://anasbetis023.medium.com/how-one-bug-scored-me-double-rewards-355b8d02cdbf
 
+REWARD: $100 + $200 = $300
+
 ABOUT: Bro do good use of shodan dorking, google dorking to find endpoint target and got a idor 
 
 LET'S START THE STORY: 
-
-
-
+1. The fact bro didnot use any subdomain finder tool because: anything.website.com --> always redirecting to website.com/login
+2. So, he use a shodan dork i.e -->  ssl:redacted.com\
+   2.1 From this shodan dork bro found an ip going to an subdomain {z2007.website.com} --> intresting it seems like an some old forgotten subdomain
+3. The main website i.e website.com is about video streaming and screensharing, after bit of researching he found a test page at: 
+     3.1 "z2007.example.com/agv/sampleAgent.html” --> ok this is a test page hai
+4. Ok after viewing the: z2007.redacted.com/agv/sampleAgent.html and seeing it at the burp: 
+    4.1 It's taking  a PUT request with /offer endpoint with some queries on bodies like parameter videowidth, videoheight, groupid
+        4.1.1 When changing the groupid it's giving a bit of different response then other i.e ; you give the groupid, and the server responds with the group name.
+5. So changing the groupid param, the server responds a group name --> bro reported this as “Information Disclosure [Group Name Manipulation],” and got a $100 reward
+6. Now bro didnot stops here to...he tries to found as many as subdomain and give the PUT /offer request --> but badluck didnot get anything success 
+7. Ok, again bro got an subdomain called: video.example.com which was taking the PUT request --> the server accept groupid --> intresting also support isAnonymous and new 
+    param called personid --> I can sense the bug here 
+8.  Now access this: https://video.example.net/offer?groupid=21582&isAnonymous=true&personid=1990018
+    8.1 Intercept the request and change the request method to PUT and boom the sensitive infos are in there. --> bro got $200 for this
+9. Logic and motivation: 
+    9.1 If the subdomain didnot found always do recon like google dork and shodan dork and github dork
+    9.2 Look every request carefully kun parameter lai manipulate garda k huncha hatauda k huncha everything and make a note of it
+    9.3 Gold info: Look with changing the request method: like PUT works here 
 
 
 
