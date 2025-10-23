@@ -176,7 +176,25 @@ LET'S START THE ACTUAL STORY:
 Found a high-impact IDOR where change_addr_order_id is a trivially predictable derivation of order_id (add 65536);
 Fixing requires proper ownership checks and replacing predictable IDs with opaque tokens or signed IDs.
 
- 
+ -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+OCT - 23 : 
+
+https://medium.com/@mohammed0x04/how-i-found-two-api-vulnerabilities-using-website-source-code-6c4b0dc54d6f
+
+REWARD: 
+
+ABOUT: Bro, found an two api bugs by analyzing the source code i.e js files
+
+LET'S START THE STORY: 
+1. Bro hunt on the main domain, --> he found out that it was using an react framework
+2. From the source code {web dev tools} bro found the folder called [web-app] that contains the code of the frontend.
+3. Bro downloaded the soruce code and found some vulnerabilites --> he uses chrome extension called:  { resources saver } to download it
+4. Bro started looking for the api endpoint in the source code what he founds is --> he got a folder called { api } that contains files with lots of api endpoints.
+5. After lots of testing bro founds two access control with two of the apis.
+6. Adding and deleting buttons on any video on target.com --> this means bro can add or delete the button on any video let's see how: 
+    6.1 There was a feature to upload a video, to do this from the source code this api endpoint was found: 
+      6.1.1 v1/videos/<video_id>/cta
 
 
 
